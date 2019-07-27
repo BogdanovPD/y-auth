@@ -1,0 +1,28 @@
+server:
+  port: 8102
+
+security:
+  jwt:
+    key-store: classpath:keystore.jks
+    key-store-password: n4W@h9dJGw
+    key-pair-alias: servercert
+    key-pair-password: n4W@h9dJGw
+
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:8432/why?currentSchema=auth
+    username: why_auth_usr
+    password: $mw4MH_N8_
+  jpa:
+    properties:
+      hibernate:
+        temp:
+          use_jdbc_metadata_defaults: false
+    show-sql: true
+    generate-ddl: false
+    hibernate:
+      ddl-auto: none
+  liquibase:
+    default-schema: auth
+    enabled: true
