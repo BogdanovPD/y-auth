@@ -18,7 +18,6 @@ import org.why.studio.auth.entities.UserEntity;
 import org.why.studio.auth.repositories.UserRepository;
 import org.why.studio.auth.services.UserService;
 
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -33,15 +32,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void initialCreate(String email) {
-        Optional<UserEntity> userEntityOpt = userRepository.findByEmail(email.toLowerCase());
-        if (userEntityOpt.isPresent()) {
-            String msg = "Пользователь с таким email уже существует";
-            log.error(msg);
-            throw new ResponseStatusException(HttpStatus.CONFLICT, msg);
-        }
-        userRepository.save(UserEntity.builder()
-                .email(email)
-                .build());
+        userRepository.findByEmail(email.toLowerCase()).ifPresentOrElse(
+                u -> {
+                    String msg = "Пользователь с таким email уже существует";
+                    log.error(msg);
+                    throw new ResponseStatusException(HttpStatus.CONFLICT, msg);
+                },
+                () -> userRepository.save(UserEntity.builder()
+                        .email(email)
+                        .build()));
     }
 
     @Override
@@ -55,23 +54,22 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void save(UserDto userDto) {
-        if (userRepository.findByEmailAndEnabledIsFalse(userDto.getEmail()).isPresent()) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Пользователь должен быть активен: " +
-                    userDto.getEmail());
-        }
-        userRepository.save(yConversionService.convert(userDto, UserEntity.class));
+        userRepository.findByEmailAndEnabledIsFalse(userDto.getEmail()).ifPresentOrElse(
+                u -> {
+                    throw new ResponseStatusException(HttpStatus.CONFLICT, "Пользователь должен быть активен: " +
+                            userDto.getEmail());
+                },
+                () -> userRepository.save(yConversionService.convert(userDto, UserEntity.class)));
     }
 
     @Override
     public void activateUser(String email) {
-        Optional<UserEntity> userEntityOpt = userRepository.findByEmailAndEnabledIsFalse(email.toLowerCase());
-        if (userEntityOpt.isEmpty()) {
-            log.warn("Неактивный пользователь не найден: " + email);
-            return;
-        }
-        UserEntity userEntity = userEntityOpt.get();
-        userEntity.setEnabled(true);
-        userRepository.save(userEntity);
+        userRepository.findByEmailAndEnabledIsFalse(email.toLowerCase()).ifPresentOrElse(
+                u -> {
+                    u.setEnabled(true);
+                    userRepository.save(u);
+                },
+                () -> log.warn("Неактивный пользователь не найден: " + email));
     }
 
     @Override
@@ -81,16 +79,19 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Optional<UserEntity> userEntityOpt = userRepository.findByEmailAndEnabledIsTrue(email.toLowerCase());
-        if (userEntityOpt.isEmpty()) {
-            String msg = "Пользователь не найден: " + email;
-            log.error(msg);
-            throw new UsernameNotFoundException(msg);
-        }
-        UserEntity userEntity = userEntityOpt.get();
-        return new User(userEntity.getEmail(), userEntity.getPassword(), userEntity.getRoles().stream()
-                .map(RoleEntity::getName)
-                .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toSet()));
+        return userRepository.findByEmailAndEnabledIsTrue(email.toLowerCase())
+                .map(
+                        u -> new User(u.getEmail(), u.getPassword(), u.getRoles().stream()
+                                .map(RoleEntity::getName)
+                                .map(SimpleGrantedAuthority::new)
+                                .collect(Collectors.toSet()))
+                )
+                .orElseThrow(
+                        () -> {
+                            String msg = "Пользователь не найден: " + email;
+                            log.error(msg);
+                            return new UsernameNotFoundException(msg);
+                        }
+                );
     }
 }
