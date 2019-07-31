@@ -8,14 +8,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration
 public class SecurityConfig {
 
-    private PasswordEncoder passwordEncoder;
-
     @Bean
     public PasswordEncoder passwordEncoder() {
-        if (passwordEncoder == null) {
-            passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
-        }
-        return passwordEncoder;
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
 }
