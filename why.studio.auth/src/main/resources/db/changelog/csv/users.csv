@@ -1,0 +1,2 @@
+id,email,phone,first_name,last_name,password,enabled
+3089d3be-2cf9-4e7c-9e0a-7dfb95d5afba,bogdanovpd@gmail.com,79111483513,Павел,Богданов,{bcrypt}$2a$10$Rp22iLf/mj0v1BL2dog2yelK7NNXY7wgxZUGl/s/FRrkV7J99Miai,true
