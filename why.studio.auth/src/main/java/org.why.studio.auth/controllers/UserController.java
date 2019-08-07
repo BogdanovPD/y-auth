@@ -3,9 +3,7 @@ package org.why.studio.auth.controllers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.why.studio.auth.dto.UserDto;
 import org.why.studio.auth.services.UserService;
 
@@ -25,6 +23,11 @@ public class UserController {
     public ResponseEntity<?> createUser(@RequestBody UserDto userDto) {
         userService.createUser(userDto);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping(value = "/user/{id}")
+    public ResponseEntity<UserDto> getUserById(@PathVariable("id") String userId) {
+        return ResponseEntity.ok(userService.getUserById(userId));
     }
 
 }

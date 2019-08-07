@@ -20,6 +20,8 @@ import org.why.studio.auth.services.UserService;
 
 import java.util.stream.Collectors;
 
+import static org.why.studio.auth.util.Utils.getUuid;
+
 @Slf4j
 @Service
 @Transactional
@@ -75,6 +77,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean userExists(String email) {
         return userRepository.findByEmail(email).isPresent();
+    }
+
+    @Override
+    public UserDto getUserById(String userId) {
+        return yConversionService.convert(
+                userRepository.findById(getUuid(userId)).orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                "Пользователь не найден по id=" + userId)),
+                UserDto.class);
     }
 
     @Override
