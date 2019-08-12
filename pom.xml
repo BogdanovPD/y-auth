@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.1.6.RELEASE</version>
+        <version>2.1.7.RELEASE</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>WHY.STUDIO</groupId>
@@ -27,6 +27,7 @@
         <jaxb-api.version>2.3.1</jaxb-api.version>
         <spring-security-oauth2.version>2.3.5.RELEASE</spring-security-oauth2.version>
         <spring-security-jwt.version>1.0.10.RELEASE</spring-security-jwt.version>
+        <spring-cloud.version>Greenwich.SR2</spring-cloud.version>
         <commons-io.version>2.6</commons-io.version>
     </properties>
 
@@ -58,6 +59,21 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
+        </dependency>
+        <!--Spring Cloud-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-config-client</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.security</groupId>
+                    <artifactId>spring-security-crypto</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
         </dependency>
 
         <!--Liquibase-->
@@ -119,17 +135,29 @@
         </dependency>
     </dependencies>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <build>
-        <sourceDirectory>why.studio.auth/src/main/java</sourceDirectory>
-        <testSourceDirectory>why.studio.auth/src/test/java</testSourceDirectory>
+        <sourceDirectory>src/main/java</sourceDirectory>
+        <testSourceDirectory>src/test/java</testSourceDirectory>
         <resources>
             <resource>
-                <directory>why.studio.auth/src/main/resources</directory>
+                <directory>src/main/resources</directory>
             </resource>
         </resources>
         <testResources>
             <testResource>
-                <directory>why.studio.auth/src/test/resources</directory>
+                <directory>src/test/resources</directory>
             </testResource>
         </testResources>
 
@@ -145,34 +173,10 @@
                         </goals>
                         <configuration>
                             <classifier>exec</classifier>
-                            <mainClass>org.why.studio.auth.WhyAuthApp</mainClass>
+                            <mainClass>com.why.studio.auth.WhyAuthApp</mainClass>
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.0</version>
-                <configuration>
-                    <release>11</release>
-                    <annotationProcessorPaths>
-                        <path>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                            <version>${lombok.version}</version>
-                        </path>
-                    </annotationProcessorPaths>
-                    <source>11</source>
-                    <target>11</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <forkCount>0</forkCount>
-                </configuration>
             </plugin>
         </plugins>
     </build>
