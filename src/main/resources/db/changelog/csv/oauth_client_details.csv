@@ -1,0 +1,2 @@
+client_id;client_secret;scope;authorized_grant_types;authorities
+y-oauth-client;{bcrypt}$2a$10$qP2mOumPpbrY13Gq7Jfp0uNfUxQ.xidMAl3sH//WrOUDQewcx8KyC;read,write;password,authorization_code,refresh_token;ROLE_SUPERUSER

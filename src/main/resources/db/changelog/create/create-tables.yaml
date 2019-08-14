@@ -1,0 +1,130 @@
+databaseChangeLog:
+  - property:
+      name: next_uuid
+      value: uuid_in(overlay(overlay(md5(random()::text || ':' || clock_timestamp()::text) placing '4' from 13) placing to_hex(floor(random()*(11-8+1) + 8)::int)::text from 17)::cstring)
+      dbms: postgresql
+  - changeSet:
+      id: 1
+      author: pavel
+      changes:
+        - createTable:
+            tableName: roles
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_roles
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+                    unique: true
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  defaultValueComputed: ${next_uuid}
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_users
+                    nullable: false
+              - column:
+                  name: email
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: phone
+                  type: varchar(255)
+                  defaultValue: ''
+                  constraints:
+                    nullable: false
+              - column:
+                  name: first_name
+                  type: varchar(255)
+                  defaultValue: ''
+                  constraints:
+                    nullable: false
+              - column:
+                  name: last_name
+                  type: varchar(255)
+                  defaultValue: ''
+                  constraints:
+                    nullable: false
+              - column:
+                  name: password
+                  type: varchar(255)
+                  defaultValue: ''
+                  constraints:
+                    nullable: false
+              - column:
+                  name: enabled
+                  type: boolean
+                  defaultValue: false
+        - createTable:
+            tableName: users_roles
+            columns:
+              - column:
+                  name: user_id
+                  type: uuid
+                  constraints:
+                    foreignKeyName: fk_users_roles_user
+                    references: users(id)
+              - column:
+                  name: role_id
+                  type: integer
+                  constraints:
+                    foreignKeyName: fk_users_roles_role
+                    references: roles(id)
+
+        - createTable:
+            tableName: oauth_client_details
+            columns:
+              - column:
+                  name: client_id
+                  type: varchar(256)
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_oauth_client_details
+              - column:
+                  name: client_secret
+                  type: varchar(256)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: resource_ids
+                  type: varchar(256)
+              - column:
+                  name: scope
+                  type: varchar(256)
+              - column:
+                  name: authorized_grant_types
+                  type: varchar(256)
+              - column:
+                  name: web_server_redirect_uri
+                  type: varchar(256)
+              - column:
+                  name: authorities
+                  type: varchar(256)
+              - column:
+                  name: access_token_validity
+                  type: integer
+                  defaultValue: 60 * 60 * 10
+              - column:
+                  name: refresh_token_validity
+                  type: integer
+                  defaultValue: 60 * 60 * 24 * 10
+              - column:
+                  name: additional_information
+                  type: varchar(4096)
+              - column:
+                  name: autoapprove
+                  type: varchar(256)
+                  defaultValue: true

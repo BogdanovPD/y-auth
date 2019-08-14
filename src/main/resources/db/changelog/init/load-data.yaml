@@ -1,0 +1,70 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2
+      author: pavel
+      changes:
+        - loadData:
+            columns:
+            - column:
+                name: id
+                type: numeric
+            - column:
+                name: name
+                type: string
+            file: db/changelog/csv/roles.csv
+            tableName: roles
+        - loadData:
+            columns:
+            - column:
+                name: id
+                type: uuid
+            - column:
+                name: email
+                type: string
+            - column:
+                name: phone
+                type: string
+            - column:
+                name: first_name
+                type: string
+            - column:
+                name: last_name
+                type: string
+            - column:
+                name: password
+                type: string
+            - column:
+                name: enabled
+                type: boolean
+            file: db/changelog/csv/users.csv
+            tableName: users
+        - loadData:
+            columns:
+            - column:
+                name: user_id
+                type: uuid
+            - column:
+                name: role_id
+                type: numeric
+            file: db/changelog/csv/users_roles.csv
+            tableName: users_roles
+        - loadData:
+            columns:
+            - column:
+                name: client_id
+                type: string
+            - column:
+                name: client_secret
+                type: string
+            - column:
+                name: scope
+                type: string
+            - column:
+                name: authorized_grant_types
+                type: string
+            - column:
+                name: authorities
+                type: string
+            separator: ";"
+            file: db/changelog/csv/oauth_client_details.csv
+            tableName: oauth_client_details
